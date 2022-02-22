@@ -42,9 +42,9 @@ resource "azurerm_virtual_network" "vnet" {
 ### Subnets ### 
 resource "azurerm_subnet" "private" {
   name                 = "${var.resource_group_name}-subnet_private"
-  resource_group_name  = azurerm_resource_group.example.name
-  virtual_network_name = azurerm_virtual_network.example.name
-  address_prefixes     = var.subnet_private_tags["address_prefixes"]
+  resource_group_name  = azurerm_resource_group.resource_group.name
+  virtual_network_name = azurerm_virtual_network.vnet.name
+  address_prefixes     = ["10.0.1.0/24"]
 
   delegation {
     name = "acctestdelegation"
@@ -64,7 +64,7 @@ resource "azurerm_subnet" "public" {
   name                 = "${var.resource_group_name}-subnet_public"
   resource_group_name  = azurerm_resource_group.resource_group.name
   virtual_network_name = azurerm_virtual_network.vnet.name
-  address_prefixes     = var.subnet_public_tags["address_prefixes"]
+  address_prefixes     = ["10.0.2.0/24"]
 
   delegation {
     name = "acctestdelegation"
@@ -78,8 +78,8 @@ resource "azurerm_subnet" "public" {
 
 resource "azurerm_public_ip" "public_ip" {
   name                = "acceptanceTestPublicIp1"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.resource_group.name
+  location            = azurerm_resource_group.resource_group.location
   allocation_method   = "Static"
 
   tags = {
@@ -89,8 +89,8 @@ resource "azurerm_public_ip" "public_ip" {
 
 resource "azurerm_public_ip_prefix" "example" {
   name                = "acceptanceTestPublicIpPrefix1"
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.resource_group.location
+  resource_group_name = azurerm_resource_group.resource_group.name
 
   prefix_length = 31
 
@@ -101,8 +101,8 @@ resource "azurerm_public_ip_prefix" "example" {
 
 resource "azurerm_route_table" "example" {
   name                          = "acceptanceTestSecurityGroup1"
-  location                      = azurerm_resource_group.example.location
-  resource_group_name           = azurerm_resource_group.example.name
+  location                      = azurerm_resource_group.resource_group.location
+  resource_group_name           = azurerm_resource_group.resource_group.name
   disable_bgp_route_propagation = false
 
   route {
@@ -118,15 +118,15 @@ resource "azurerm_route_table" "example" {
 
 
 ### Gateways ###
-
+#2022-02-22 ND changed example.id subnet to public.id
 resource "azurerm_nat_gateway" "example" {
   name                = "example-natgateway"
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.resource_group.location
+  resource_group_name = azurerm_resource_group.resource_group.name
 }
 
 resource "azurerm_subnet_nat_gateway_association" "example" {
-  subnet_id      = azurerm_subnet.example.id
+  subnet_id      = azurerm_subnet.public.id
   nat_gateway_id = azurerm_nat_gateway.example.id
 }
 
@@ -134,8 +134,8 @@ resource "azurerm_subnet_nat_gateway_association" "example" {
 
 resource "azurerm_network_security_group" "example" {
   name                = "example-nsg"
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.resource_group.location
+  resource_group_name = azurerm_resource_group.resource_group.name
 
   security_rule {
     name                       = "test123"
@@ -149,8 +149,8 @@ resource "azurerm_network_security_group" "example" {
     destination_address_prefix = "*"
   }
 }
-
+#2022-02-22 ND changed example.id subnet to public.id
 resource "azurerm_subnet_network_security_group_association" "example" {
-  subnet_id                 = azurerm_subnet.example.id
+  subnet_id                 = azurerm_subnet.public.id
   network_security_group_id = azurerm_network_security_group.example.id
 }
