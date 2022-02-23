@@ -29,9 +29,9 @@ variable "vnet_tags" {
 ### Subnets ###
 variable "subnet_public_tags" {
   description = "Tags for the public subnet"
-  default = ["10.0.0.0/24"]
+  default = ["10.0.0.1/24"]
 }
 variable "subnet_private_tags" {
   description = "Tags for the private subnet"
-  default = ["10.0.0.0/24"]
+  default = ["10.0.0.2/24"]
 }
